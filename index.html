@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ماشین‌حساب هزینه خوراک دام/طیور</title>
+
+  <style>
+    body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+            direction: rtl;
+            text-align: right;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #0056b3;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .form-section {
+            background-color: #e6ffe6; /* سبز روشن‌تر */
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            border: 1px solid #d4edda;
+        }
+        .form-section h3 {
+            color: #28a745;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: right;
+            border-bottom: 1px dashed #a3e2b2;
+            padding-bottom: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input.currency-input {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+            text-align: left;
+            direction: ltr;
+        }
+        button {
+            background-color: #20c997; /* فیروزه‌ای */
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 100%;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #17a2b8;
+        }
+        .results, .suggestions {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e0f7fa; /* آبی آسمانی روشن */
+            border: 1px solid #b2ebf2;
+            border-radius: 5px;
+        }
+        .results p, .suggestions p, .suggestions ul {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            text-align: justify;
+        }
+        .results strong {
+            color: #007bff;
+        }
+        .suggestions strong {
+            color: #28a745;
+        }
+        .note {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+            text-align: justify;
+        }
+  </style>
+
+  
+</head>
+<body>
+  <div class="container">
+        <h1>ماشین‌حساب هزینه خوراک دام/طیور</h1>
+
+        <form id="feedCostCalculatorForm">
+            <div class="form-section">
+                <h3>اطلاعات دام/طیور</h3>
+                <div class="form-group">
+                    <label for="animalType">نوع دام/طیور:</label>
+                    <select id="animalType" name="animalType" required>
+                        <option value="">انتخاب کنید...</option>
+                        <option value="beef_cattle">گاو گوشتی</option>
+                        <option value="dairy_calf">گوساله شیری (پرواربندی)</option>
+                        <option value="sheep_lamb">گوسفند/بره</option>
+                        <option value="broiler_chicken">مرغ گوشتی</option>
+                        <option value="layer_chicken">مرغ تخم‌گذار</option>
+                        <option value="other">سایر</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="numAnimals">تعداد دام/طیور:</label>
+                    <input type="text" id="numAnimals" name="numAnimals" class="currency-input" placeholder="مثال: 100" required>
+                </div>
+                <div class="form-group">
+                    <label for="initialWeight">میانگین وزن اولیه هر رأس/قطعه (کیلوگرم):</label>
+                    <input type="text" id="initialWeight" name="initialWeight" class="currency-input" step="0.1" placeholder="مثال: 250 (گاو)، 2 (جوجه)">
+                </div>
+                <div class="form-group">
+                    <label for="targetWeight">میانگین وزن هدف هر رأس/قطعه (کیلوگرم):</label>
+                    <input type="text" id="targetWeight" name="targetWeight" class="currency-input" step="0.1" placeholder="مثال: 500 (گاو)، 3 (مرغ)">
+                </div>
+                <div class="form-group">
+                    <label for="fatteningDays">مدت زمان پرواربندی/پرورش (روز):</label>
+                    <input type="text" id="fatteningDays" name="fatteningDays" class="currency-input" placeholder="مثال: 180 (گاو)، 45 (مرغ)">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>اطلاعات خوراک</h3>
+                <div class="form-group">
+                    <label for="fcr">ضریب تبدیل غذا (FCR):</label>
+                    <input type="text" id="fcr" name="fcr" class="currency-input" step="0.01" placeholder="مثال: 6.0 (گاو)، 1.6 (مرغ)" required>
+                    <p class="note">FCR (Feed Conversion Ratio) = میزان خوراک مصرفی / افزایش وزن زنده. این عدد نشان می‌دهد برای تولید یک کیلوگرم وزن زنده، چند کیلوگرم خوراک نیاز است.</p>
+                </div>
+                <div class="form-group">
+                    <label for="feedPricePerKg">قیمت هر کیلوگرم خوراک (ریال/تومان):</label>
+                    <input type="text" id="feedPricePerKg" name="feedPricePerKg" class="currency-input" step="10" placeholder="مثال: 18,000" required>
+                </div>
+            </div>
+
+            <button type="submit">محاسبه هزینه خوراک</button>
+        </form>
+
+        <div class="results" id="feedCostResults">
+            <h2>نتایج محاسبه هزینه خوراک</h2>
+            <p><strong>افزایش وزن کل گله:</strong> <span id="totalWeightGain">--</span> کیلوگرم</p>
+            <p><strong>میزان خوراک مصرفی کل گله:</strong> <span id="totalFeedConsumption">--</span> کیلوگرم</p>
+            <p><strong>هزینه کل خوراک برای کل گله:</strong> <span id="totalFeedCost">--</span> ریال/تومان</p>
+            <p><strong>هزینه خوراک به ازای هر رأس/قطعه:</strong> <span id="feedCostPerAnimal">--</span> ریال/تومان</p>
+            <p><strong>هزینه خوراک به ازای هر کیلوگرم افزایش وزن:</strong> <span id="feedCostPerKgGain">--</span> ریال/تومان</p>
+            <p class="note">این محاسبات بر اساس اطلاعات ورودی شما و FCR تخمینی انجام شده‌اند. FCR و قیمت خوراک می‌توانند متغیر باشند و بر نتایج تأثیرگذارند.</p>
+        </div>
+
+        <div class="suggestions" id="feedSuggestions">
+            <h2>توضیحات و پیشنهادات بهبود</h2>
+            <h3>اهمیت مدیریت خوراک:</h3>
+            <ul>
+                <li><strong>خوراک، بزرگترین هزینه:</strong> هزینه خوراک معمولاً بین 60 تا 80 درصد از کل هزینه‌های تولید در دامپروری و طیور را شامل می‌شود. مدیریت بهینه آن کلید سودآوری است.</li>
+                <li><strong>تأثیر FCR:</strong> هر چه FCR کمتر باشد، به این معنی است که دام/طیور شما برای هر کیلوگرم افزایش وزن، خوراک کمتری مصرف کرده و از نظر اقتصادی بهره‌ورتر است.</li>
+                <li><strong>کیفیت خوراک:</strong> استفاده از خوراک بالانس و با کیفیت مناسب برای هر مرحله از رشد دام/طیور، به بهبود FCR و سلامت گله کمک می‌کند.</li>
+            </ul>
+
+            <h3>پیشنهادات برای کاهش هزینه خوراک و بهبود FCR:</h3>
+            <ul>
+                <li><strong>فرمولاسیون صحیح:</strong> اطمینان از اینکه جیره غذایی بر اساس نیازهای واقعی دام/طیور (سن، وزن، مرحله تولید) بالانس شده است.</li>
+                <li><strong>کیفیت مواد اولیه:</strong> استفاده از مواد اولیه با کیفیت بالا و عاری از سموم قارچی.</li>
+                <li><strong>کاهش هدررفت:</strong> مدیریت صحیح انبارداری خوراک برای جلوگیری از فساد، کپک‌زدگی و آلودگی. استفاده از آبخوری و دانخوری مناسب برای جلوگیری از ریخت و پاش خوراک.</li>
+                <li><strong>مدیریت محیطی:</strong> فراهم کردن شرایط محیطی مناسب (دما، تهویه) برای کاهش استرس دام/طیور، که به طور مستقیم بر مصرف و تبدیل خوراک تأثیر می‌گذارد.</li>
+                <li><strong>سلامت دام/طیور:</strong> کنترل بیماری‌ها و انگل‌ها؛ دام‌های بیمار خوراک را به خوبی مصرف و تبدیل نمی‌کنند.</li>
+                <li><strong>ژنetik:</strong> انتخاب نژادهایی که دارای پتانسیل رشد بالا و FCR مطلوب هستند.</li>
+                <li><strong>پایش مداوم:</strong> وزن‌کشی منظم و ثبت مصرف خوراک برای محاسبه FCR واقعی و تنظیم جیره بر اساس آن.</li>
+            </ul>
+
+            <p class="note">همیشه با متخصصین تغذیه دام و طیور مشورت کنید تا بهترین استراتژی خوراک‌دهی را برای مزرعه خود پیاده‌سازی کنید.</p>
+        </div>
+    </div>
+
+  <script>
+    // تابع کمکی برای حذف جداکننده‌ها و تبدیل به عدد
+        function cleanAndParseNumber(value) {
+            // حذف تمام کاراکترهای غیر عددی به جز نقطه (برای اعشار)
+            const cleanedValue = String(value).replace(/[^0-9.]/g, '');
+            return parseFloat(cleanedValue || '0'); // اگر خالی بود، 0 برگرداند
+        }
+
+        // تابع کمکی برای فرمت‌دهی عدد با جداکننده هزارگان
+        function formatNumberWithCommas(number, decimalPlaces = 0) {
+            if (isNaN(number)) return '';
+            // اطمینان از اینکه عدد به تعداد اعشار مورد نظر گرد شده و سپس فرمت شود
+            return parseFloat(number.toFixed(decimalPlaces)).toLocaleString('fa-IR');
+        }
+
+        // اعمال فرمت‌دهی به فیلدهای ورودی
+        document.addEventListener('DOMContentLoaded', function() {
+            const currencyInputs = document.querySelectorAll('.currency-input');
+
+            currencyInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    let value = this.value;
+                    // حذف کاراکترهای غیر عددی به جز نقطه (برای اعشار)
+                    const cleanedValue = value.replace(/[^0-9.]/g, ''); 
+                    
+                    // اگر حاوی نقطه بود و در انتهای آن یک نقطه اضافی وجود داشت، آن را حفظ کن
+                    if (value.endsWith('.') && cleanedValue.endsWith('.')) {
+                        this.value = cleanedValue;
+                        return;
+                    }
+
+                    // تبدیل به عدد و سپس فرمت‌دهی مجدد
+                    let number = parseFloat(cleanedValue);
+                    if (!isNaN(number)) {
+                        // اگر عدد اعشاری داشت، آن را به عنوان اعشار نگه دار
+                        if (cleanedValue.includes('.')) {
+                            // فقط قسمت صحیح را فرمت کن، اعشار را به همین صورت نگه دار
+                            const parts = cleanedValue.split('.');
+                            const integerPart = parseFloat(parts[0]);
+                            this.value = formatNumberWithCommas(integerPart) + '.' + parts[1];
+                        } else {
+                            this.value = formatNumberWithCommas(number);
+                        }
+                    } else {
+                        this.value = ''; 
+                    }
+                });
+
+                input.addEventListener('blur', function() {
+                    let value = this.value;
+                    const cleanedValue = value.replace(/[^0-9.]/g, '');
+                    let number = parseFloat(cleanedValue);
+                    if (!isNaN(number) && cleanedValue !== '') {
+                        // تعیین تعداد اعشار بر اساس نیاز فیلد
+                        let decimalPlaces = 0;
+                        if (input.id === 'fcr' || input.id === 'initialWeight' || input.id === 'targetWeight') {
+                            decimalPlaces = 2; // برای FCR و وزن‌ها ممکن است اعشار لازم باشد
+                        }
+                        this.value = formatNumberWithCommas(number, decimalPlaces);
+                    } else if (cleanedValue === '') {
+                        this.value = '';
+                    }
+                });
+
+                input.addEventListener('focus', function() {
+                    let value = this.value;
+                    this.value = value.replace(/[^0-9.]/g, ''); 
+                });
+            });
+        });
+
+        // منطق محاسبه اصلی
+        document.getElementById('feedCostCalculatorForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // گرفتن مقادیر ورودی با استفاده از تابع cleanAndParseNumber
+            const animalType = document.getElementById('animalType').value;
+            const numAnimals = cleanAndParseNumber(document.getElementById('numAnimals').value);
+            const initialWeight = cleanAndParseNumber(document.getElementById('initialWeight').value);
+            const targetWeight = cleanAndParseNumber(document.getElementById('targetWeight').value);
+            const fatteningDays = cleanAndParseNumber(document.getElementById('fatteningDays').value);
+            const fcr = cleanAndParseNumber(document.getElementById('fcr').value);
+            const feedPricePerKg = cleanAndParseNumber(document.getElementById('feedPricePerKg').value);
+
+            // اعتبارسنجی اولیه
+            if (numAnimals <= 0 || targetWeight <= initialWeight || fatteningDays <= 0 || fcr <= 0 || feedPricePerKg <= 0) {
+                alert('لطفاً همه فیلدهای ضروری را با مقادیر معتبر (بزرگتر از صفر) پر کنید و اطمینان حاصل کنید که وزن هدف از وزن اولیه بیشتر است.');
+                return;
+            }
+
+            // --- محاسبات ---
+            const totalWeightGainPerAnimal = targetWeight - initialWeight;
+            const totalWeightGainForHerd = totalWeightGainPerAnimal * numAnimals;
+
+            const totalFeedConsumptionForHerd = totalWeightGainForHerd * fcr;
+            const totalFeedCost = totalFeedConsumptionForHerd * feedPricePerKg;
+
+            const feedCostPerAnimal = totalFeedCost / numAnimals;
+            const feedCostPerKgGain = totalFeedCost / totalWeightGainForHerd;
+
+            // --- نمایش نتایج با فرمت دهی سه تا سه تا ---
+            document.getElementById('totalWeightGain').textContent = formatNumberWithCommas(totalWeightGainForHerd, 2);
+            document.getElementById('totalFeedConsumption').textContent = formatNumberWithCommas(totalFeedConsumptionForHerd, 2);
+            document.getElementById('totalFeedCost').textContent = formatNumberWithCommas(totalFeedCost);
+            document.getElementById('feedCostPerAnimal').textContent = formatNumberWithCommas(feedCostPerAnimal);
+            document.getElementById('feedCostPerKgGain').textContent = formatNumberWithCommas(feedCostPerKgGain);
+        });
+  </script>
+</body>
+</html>
