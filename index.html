@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ماشین‌حساب محاسبه خوراک دام و طیور</title>
+
+  <style>
+    body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+            direction: rtl;
+            text-align: right;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #0056b3;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .form-section {
+            background-color: #e6f7ff; /* آبی بسیار روشن */
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            border: 1px solid #b3e0ff;
+        }
+        .form-section h3 {
+            color: #007bff;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: right;
+            border-bottom: 1px dashed #80c2ff;
+            padding-bottom: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="number"],
+        select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+            text-align: left; /* برای نمایش بهتر اعداد */
+            direction: ltr; /* برای نمایش بهتر اعداد */
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 100%;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .results, .suggestions {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa; /* خاکستری روشن */
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+        }
+        .results p, .suggestions p, .suggestions ul {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            text-align: justify;
+        }
+        .results strong {
+            color: #0056b3;
+        }
+        .suggestions strong {
+            color: #007bff;
+        }
+        .note {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+            text-align: justify;
+        }
+  </style>
+
+  
+</head>
+<body>
+  <div class="container">
+        <h1>ماشین‌حساب محاسبه خوراک دام و طیور</h1>
+
+        <form id="feedCalculatorForm">
+            <div class="form-section">
+                <h3>الف) اطلاعات دام/طیور</h3>
+                <div class="form-group">
+                    <label for="animalType">نوع دام/طیور:</label>
+                    <select id="animalType" name="animalType" required>
+                        <option value="">انتخاب کنید...</option>
+                        <option value="beef_cattle">گاو گوشتی (پرواری)</option>
+                        <option value="dairy_cattle">گاو شیری</option>
+                        <option value="sheep_lamb">گوسفند/بره</option>
+                        <option value="broiler">جوجه گوشتی</option>
+                        <option value="layer_hen">مرغ تخم‌گذار</option>
+                        <option value="other">سایر</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="numAnimals">تعداد رأس دام/طیور:</label>
+                    <input type="number" id="numAnimals" name="numAnimals" min="1" placeholder="مثال: 100" required>
+                </div>
+                <div class="form-group">
+                    <label for="dailyFeedConsumption">مصرف خوراک روزانه به ازای هر رأس (کیلوگرم):</label>
+                    <input type="number" id="dailyFeedConsumption" name="dailyFeedConsumption" step="0.01" min="0" placeholder="مثال: 8 (برای گاو) یا 0.12 (برای مرغ)" required>
+                    <p class="note">این مقدار باید بر اساس نوع، وزن و مرحله رشد دام/طیور شما تعیین شود.</p>
+                </div>
+                <div class="form-group">
+                    <label for="feedPricePerKg">قیمت هر کیلوگرم خوراک (ریال/تومان):</label>
+                    <input type="number" id="feedPricePerKg" name="feedPricePerKg" step="0.1" min="0" placeholder="مثال: 15,000" required>
+                </div>
+                <div class="form-group">
+                    <label for="feedingPeriodDays">مدت زمان دوره خوراک‌دهی (روز):</label>
+                    <input type="number" id="feedingPeriodDays" name="feedingPeriodDays" min="1" placeholder="مثال: 30" required>
+                </div>
+            </div>
+
+            <button type="submit">محاسبه خوراک</button>
+        </form>
+
+        <div class="results" id="feedCalculationResults">
+            <h2>نتایج محاسبه خوراک</h2>
+            <p><strong>نوع دام/طیور:</strong> <span id="displayAnimalType">--</span></p>
+            <p><strong>تعداد رأس:</strong> <span id="displayNumAnimals">--</span></p>
+            <p><strong>مدت زمان دوره:</strong> <span id="displayFeedingPeriodDays">--</span> روز</p>
+            <hr>
+            <p><strong>کل خوراک مصرفی روزانه:</strong> <span id="totalDailyFeed">--</span> کیلوگرم</p>
+            <p><strong>کل خوراک مصرفی در دوره:</strong> <span id="totalPeriodFeed">--</span> کیلوگرم</p>
+            <p><strong>هزینه کل خوراک در دوره:</strong> <span id="totalFeedCost">--</span> ریال/تومان</p>
+            <p class="note">این محاسبات یک تخمین بر اساس داده‌های ورودی شماست. نوسانات بازار و تغییر در مصرف دام/طیور می‌توانند بر نتایج واقعی تأثیر بگذارند.</p>
+        </div>
+
+        <div class="suggestions" id="feedSuggestions">
+            <h2>توضیحات و پیشنهادات بهبود</h2>
+            <h3>اهمیت مدیریت خوراک:</h3>
+            <ul>
+                <li>**بزرگترین هزینه:** خوراک معمولاً بزرگترین جزء هزینه در دامداری و طیور است. مدیریت دقیق آن برای سودآوری حیاتی است.</li>
+                <li>**بهداشت و رشد:** تغذیه مناسب بر سلامت، رشد و تولید دام/طیور تأثیر مستقیم دارد.</li>
+            </ul>
+
+            <h3>پیشنهادات برای بهینه‌سازی:</h3>
+            <ul>
+                <li>**فرمولاسیون جیره:** از متخصصین تغذیه دام برای فرموله کردن جیره‌های متعادل و اقتصادی استفاده کنید.</li>
+                <li>**کیفیت خوراک:** از کیفیت خوراک خریداری شده اطمینان حاصل کنید تا ارزش غذایی مورد انتظار را داشته باشد.</li>
+                <li>**کاهش ضایعات:** با استفاده از آخورهای مناسب، جلوگیری از ریخت و پاش و نگهداری صحیح خوراک، ضایعات را به حداقل برسانید.</li>
+                <li>**وزن‌کشی منظم:** با وزن‌کشی دوره‌ای دام‌ها، مصرف خوراک را بر اساس وزن واقعی و مرحله رشد تنظیم کنید.</li>
+                <li>**شرایط محیطی:** استرس گرمایی، سرمایی یا تهویه نامناسب می‌تواند مصرف خوراک را کاهش یا افزایش دهد و راندمان را تحت تأثیر قرار دهد.</li>
+            </ul>
+        </div>
+    </div>
+
+  <script>
+    document.getElementById('feedCalculatorForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // گرفتن مقادیر ورودی
+            const animalType = document.getElementById('animalType').options[document.getElementById('animalType').selectedIndex].text;
+            const numAnimals = parseFloat(document.getElementById('numAnimals').value);
+            const dailyFeedConsumption = parseFloat(document.getElementById('dailyFeedConsumption').value);
+            const feedPricePerKg = parseFloat(document.getElementById('feedPricePerKg').value);
+            const feedingPeriodDays = parseFloat(document.getElementById('feedingPeriodDays').value);
+
+            // اعتبارسنجی اولیه
+            if (isNaN(numAnimals) || isNaN(dailyFeedConsumption) || isNaN(feedPricePerKg) || isNaN(feedingPeriodDays) ||
+                numAnimals <= 0 || dailyFeedConsumption < 0 || feedPricePerKg < 0 || feedingPeriodDays <= 0) {
+                alert('لطفاً تمامی فیلدها را با مقادیر عددی معتبر (مثبت) پر کنید.');
+                return;
+            }
+
+            // --- محاسبات ---
+            const totalDailyFeed = numAnimals * dailyFeedConsumption;
+            const totalPeriodFeed = totalDailyFeed * feedingPeriodDays;
+            const totalFeedCost = totalPeriodFeed * feedPricePerKg;
+
+            // --- نمایش نتایج ---
+            document.getElementById('displayAnimalType').textContent = animalType;
+            document.getElementById('displayNumAnimals').textContent = numAnimals.toLocaleString('fa-IR');
+            document.getElementById('displayFeedingPeriodDays').textContent = feedingPeriodDays.toLocaleString('fa-IR');
+
+            document.getElementById('totalDailyFeed').textContent = totalDailyFeed.toLocaleString('fa-IR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('totalPeriodFeed').textContent = totalPeriodFeed.toLocaleString('fa-IR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('totalFeedCost').textContent = totalFeedCost.toLocaleString('fa-IR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        });
+  </script>
+</body>
+</html>
